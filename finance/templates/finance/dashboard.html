@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<style>
+    .dashboard-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 20px;
+    }
+
+    .card {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .card h2 {
+        margin-top: 0;
+        font-size: 20px;
+        color: #333;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 10px;
+    }
+
+    th, td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        font-size: 14px;
+    }
+
+    th {
+        background-color: #f4f4f4;
+    }
+
+    .no-data {
+        color: #777;
+    }
+</style>
+
+<h1>Welcome, {{ user.username }}</h1>
+
+<div class="dashboard-container">
+    <div class="card">
+        <h2>Wallet</h2>
+        {% if wallet %}
+            <p>Balance: ₹{{ wallet.balance }}</p>
+            <p>Last Updated: {{ wallet.last_updated }}</p>
+        {% else %}
+            <p class="no-data">No wallet found.</p>
+        {% endif %}
+    </div>
+
+    <div class="card">
+        <h2>Shipments</h2>
+        {% if shipments %}
+            <table>
+                <tr><th>Tracking #</th><th>Origin</th><th>Destination</th><th>Status</th><th>Shipped</th><th>Delivered</th></tr>
+                {% for s in shipments %}
+                <tr>
+                    <td>{{ s.tracking_number }}</td><td>{{ s.origin }}</td><td>{{ s.destination }}</td>
+                    <td>{{ s.status }}</td><td>{{ s.shipment_date }}</td><td>{{ s.delivery_date|default:"-" }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        {% else %}
+            <p class="no-data">No shipments found.</p>
+        {% endif %}
+    </div>
+
+    <div class="card">
+        <h2>Payments</h2>
+        {% if payments %}
+            <table>
+                <tr><th>Transaction ID</th><th>Amount</th><th>Method</th><th>Date</th></tr>
+                {% for p in payments %}
+                <tr>
+                    <td>{{ p.transaction_id }}</td><td>{{ p.amount }}</td><td>{{ p.payment_method }}</td><td>{{ p.payment_date }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        {% else %}
+            <p class="no-data">No payments found.</p>
+        {% endif %}
+    </div>
+
+    <div class="card">
+        <h2>Refunds</h2>
+        {% if refunds %}
+            <table>
+                <tr><th>Shipment</th><th>Amount</th><th>Reason</th><th>Date</th></tr>
+                {% for r in refunds %}
+                <tr>
+                    <td>{{ r.shipment.tracking_number }}</td><td>{{ r.refund_amount }}</td><td>{{ r.reason }}</td><td>{{ r.refund_date }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        {% else %}
+            <p class="no-data">No refunds found.</p>
+        {% endif %}
+    </div>
+
+    <div class="card">
+        <h2>FX Transactions</h2>
+        {% if fx_transactions %}
+            <table>
+                <tr><th>From</th><th>To</th><th>Original</th><th>Converted</th><th>Rate</th><th>Date</th></tr>
+                {% for fx in fx_transactions %}
+                <tr>
+                    <td>{{ fx.original_currency }}</td><td>{{ fx.converted_currency }}</td>
+                    <td>{{ fx.original_amount }}</td><td>{{ fx.converted_amount }}</td>
+                    <td>{{ fx.fx_rate }}</td><td>{{ fx.transaction_date }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        {% else %}
+            <p class="no-data">No FX transactions found.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
