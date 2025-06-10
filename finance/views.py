@@ -44,14 +44,29 @@ def logout_view(request):
 
 from .models import Shipment, Refund, Payment, Wallet, FXTransaction
 
+from .forms import UserProfileForm
+
+from .forms import UserProfileForm  # already updated
+
 @login_required
 def customer_dashboard(request):
     user = request.user
     shipments = Shipment.objects.filter(user=user)
     refunds = Refund.objects.filter(user=user)
     payments = Payment.objects.filter(user=user)
-    wallet = Wallet.objects.filter(user=user).first()  # OneToOne
+    wallet = Wallet.objects.filter(user=user).first()
     fx_transactions = FXTransaction.objects.filter(user=user)
+
+    show_form = request.GET.get('edit') == '1'
+
+    if request.method == 'POST':
+        form = UserProfileForm(request.POST, instance=user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Profile updated successfully!")
+            return redirect('customer_dashboard')  # redirect to avoid resubmission
+    else:
+        form = UserProfileForm(instance=user)
 
     context = {
         'shipments': shipments,
@@ -59,5 +74,7 @@ def customer_dashboard(request):
         'payments': payments,
         'wallet': wallet,
         'fx_transactions': fx_transactions,
+        'form': form,
+        'show_form': show_form,
     }
     return render(request, 'finance/dashboard.html', context)
