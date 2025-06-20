@@ -1,22 +1,169 @@
 {% extends 'base.html' %}
 {% block title %}Login{% endblock %}
 
+{% block head %}
+<style>
+    .sidebar {
+        width: 250px;
+        background-color: #2e2a82;
+        color: #fff;
+        position: fixed;
+        top: 70px; /* push below navbar */
+        left: 0;
+        height: calc(100vh - 70px);
+        padding-top: 20px;
+        z-index: 10;
+    }
+
+    .sidebar ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .sidebar li {
+        padding: 15px 20px;
+        font-size: 16px;
+        display: flex;
+        align-items: center;
+    }
+
+    .sidebar li:hover,
+    .sidebar .active {
+        background-color: #4441a8;
+        cursor: pointer;
+    }
+
+    .header {
+        background-color: white;
+        color: #004aad;
+        padding: 15px 30px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 70px;
+        z-index: 100;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .header .logo {
+        font-size: 1.6rem;
+        font-weight: bold;
+        color: #004aad;
+    }
+
+    .header .nav-links {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        gap: 25px;
+    }
+
+    .header .nav-links a {
+        color: #004aad;
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+    .header .nav-links a:hover {
+        text-decoration: underline;
+    }
+
+    .header .icons {
+        display: flex;
+        gap: 20px;
+        font-size: 20px;
+        color: #004aad;
+        cursor: pointer;
+    }
+
+    .main {
+        margin-left: 250px;
+        padding: 120px 40px 40px;
+    }
+
+    input[type="text"],
+    input[type="password"],
+    input[type="email"] {
+        width: 100%;
+        max-width: 300px;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        display: block;
+        margin: 0 auto;
+        font-size: 14px;
+    }
+
+    label {
+        text-align: center;
+        display: block;
+    }
+</style>
+
+<!-- Top Navbar -->
+<div class="header">
+    <div class="logo">ParcelMyBox</div>
+    <div class="nav-links">
+        <a href="#">Home</a>
+        <a href="#">Quote</a>
+        <a href="#">Track</a>
+        <a href="#">Pricing</a>
+        <a href="#">Pickup Request</a>
+        <a href="#">About</a>
+    </div>
+    <div class="icons">
+        🛒
+        🔔
+        👤
+    </div>
+</div>
+
+<!-- Sidebar -->
+<div class="sidebar">
+    <ul>
+        <li class="active">🏠 Home</li>
+        <li>📝 Quote</li>
+        <li>📦 Pickup Request</li>
+        <li>🔍 Tracking</li>
+        <li>🏷 Pricing</li>
+        <li>🛒 Cart</li>
+        <li>📞 Customer Support</li>
+        <li><a href="{% url 'login' %}" style="color: white; text-decoration: none;">👤 Sign In</a></li>
+    </ul>
+</div>
+{% endblock %}
+
 {% block content %}
-<h2>Login</h2>
+<div class="main">
+    <h2 style="text-align: center;">User Login</h2>
 
-{% if messages %}
-  <ul class="messages">
-    {% for message in messages %}
-      <li class="{{ message.tags }}">{{ message }}</li>
-    {% endfor %}
-  </ul>
-{% endif %}
+    <form method="POST" style="max-width: 450px; margin: 30px auto; background: #fff; padding: 30px; border-radius: 10px; box-shadow: 0 0 15px rgba(0,0,0,0.1); text-align: center;">
+        {% csrf_token %}
+        {% for field in form %}
+            <div style="margin-bottom: 20px;">
+                <label for="{{ field.id_for_label }}" style="font-weight: bold; margin-bottom: 6px; color: #333;">
+                    {{ field.label }}
+                </label>
+                {{ field }}
+                {% if field.errors %}
+                    <div style="color: #d9534f; font-size: 13px; margin-top: 5px;">{{ field.errors|striptags }}</div>
+                {% endif %}
+            </div>
+        {% endfor %}
 
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Login</button>
-</form>
+        <button type="submit" style="padding: 10px 25px; background-color: #004aad; color: white; border: none; border-radius: 5px; cursor: pointer;">
+            Login
+        </button>
+    </form>
 
-<p>Don’t have an account? <a href="{% url 'register' %}">Register here</a></p>
+    <p style="text-align: center; margin-top: 20px;">
+        Don’t have an account? <a href="{% url 'register' %}">Register here</a>
+    </p>
+</div>
 {% endblock %}
