@@ -1,23 +1,130 @@
-<!-- templates/registration/register.html -->
-
 {% extends 'base.html' %}
+{% load static %}
 {% block title %}Register{% endblock %}
 
+{% block head %}
+<style>
+    .sidebar {
+        width: 280px;
+        background-color: #2e2a82;
+        color: #fff;
+        position: fixed;
+        top: 70px; /* Push below navbar */
+        left: 0;
+        height: calc(100vh - 70px);
+        padding-top: 20px;
+        z-index: 999;
+    }
+
+    .sidebar ul {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .sidebar li {
+        padding: 15px 20px;
+        font-size: 16px;
+    }
+
+    .sidebar li:hover,
+    .sidebar .active {
+        background-color: #4441a8;
+        cursor: pointer;
+    }
+
+    .main {
+        margin-left: 280px;
+        margin-top: 90px; /* Space for navbar */
+        padding: 40px;
+    }
+
+    .navbar .logo-section {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .navbar .logo-section img {
+        height: 30px;
+    }
+</style>
+
+<!-- Navbar -->
+<div class="navbar">
+    <div class="logo-section">
+        <img src="{% static 'images/logo.png' %}" alt="Logo">
+        <div class="logo">ParcelMyBox</div>
+    </div>
+    <div class="nav-links">
+        <a href="#">Home</a>
+        <a href="#">Quote</a>
+        <a href="#">Track</a>
+        <a href="#">Pricing</a>
+        <a href="#">Pickup Request</a>
+        <a href="#">About</a>
+    </div>
+    <div class="nav-icons">
+        🛒
+        🔔
+        👤
+    </div>
+</div>
+
+<!-- Sidebar -->
+<div class="sidebar">
+    <ul>
+        <li class="active">🏠 Home</li>
+        <li>📝 Quote</li>
+        <li>📦 Pickup Request</li>
+        <li>🔍 Tracking</li>
+        <li>🏷 Pricing</li>
+        <li>🛒 Cart</li>
+        <li>📞 Customer Support</li>
+        <li><a href="{% url 'login' %}" style="color: white; text-decoration: none;">👤 Sign In</a></li>
+    </ul>
+</div>
+{% endblock %}
+
 {% block content %}
-<h2>User Registration</h2>
+<div class="main">
+    <h2 style="text-align: center;">Create Your Account</h2>
 
-{% if messages %}
-  <ul class="messages">
-    {% for message in messages %}
-      <li class="{{ message.tags }}">{{ message }}</li>
-    {% endfor %}
-  </ul>
-{% endif %}
+    <form method="POST" style="max-width: 450px; margin: 30px auto; background: #fff; padding: 30px; border-radius: 10px; box-shadow: 0 0 15px rgba(0,0,0,0.1); text-align: center;">
+        {% csrf_token %}
+        {% for field in form %}
+            <div style="margin-bottom: 20px; text-align: center;">
+                <label for="{{ field.id_for_label }}" style="display: block; font-weight: bold; margin-bottom: 8px; color: #333;">
+                    {{ field.label }}
+                </label>
 
-<form method="POST">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Register</button>
-</form>
-<p>Already have an account? <a href="{% url 'login' %}">Login</a></p>
+                {% if field.name == 'email' %}
+                    <input type="email" name="email" id="id_email" required
+                        style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;"
+                        placeholder="e.g. john@example.com"
+                        pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-z]{2,}$">
+                {% else %}
+                    {{ field }}
+                {% endif %}
+
+                {% if field.errors %}
+                    <div style="color: #d9534f; font-size: 13px; margin-top: 5px;">{{ field.errors|striptags }}</div>
+                {% endif %}
+                {% if field.help_text %}
+                    <div style="font-size: 12px; color: #6c757d; margin-top: 4px;">ℹ️ {{ field.help_text|striptags }}</div>
+                {% endif %}
+            </div>
+        {% endfor %}
+
+        <div>
+            <button type="submit" style="padding: 10px 25px; background-color: #004aad; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                Register
+            </button>
+        </div>
+    </form>
+
+    <p style="text-align: center; margin-top: 20px;">
+        Already have an account? <a href="{% url 'login' %}">Login</a>
+    </p>
+</div>
 {% endblock %}
