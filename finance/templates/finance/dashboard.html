@@ -1,8 +1,49 @@
 {% extends 'base.html' %}
 {% block title %}Dashboard{% endblock %}
 
-{% block content %}
+{% block head %}
 <style>
+    .sidebar {
+        width: 280px;
+        background-color: #2e2a82;
+        color: #fff;
+        position: fixed;
+        top: 70px;
+        left: 0;
+        height: calc(100vh - 70px);
+        padding-top: 20px;
+        z-index: 999;
+    }
+
+    .sidebar ul {
+        list-style-type: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .sidebar li {
+        padding: 15px 20px;
+        font-size: 16px;
+    }
+
+    .sidebar li:hover,
+    .sidebar .active {
+        background-color: #4441a8;
+        cursor: pointer;
+    }
+
+    .sidebar a {
+        color: white;
+        text-decoration: none;
+        display: block;
+    }
+
+    .main {
+        margin-left: 280px;
+        margin-top: 90px;
+        padding: 40px;
+    }
+
     .dashboard-container {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
@@ -41,28 +82,29 @@
     .no-data {
         color: #777;
     }
+
+    .logout-link {
+        background-color: whitesmoke;
+        padding: 10px;
+        border-radius: 5px;
+        text-align: center;
+        margin: 20px;
+        font-weight: bold;
+    }
+
+    .logout-link a {
+        color:#4441a8 ;
+        text-decoration: none;
+    }
+
+    .logout-link:hover {
+        background-color: #c82333;
+    }
 </style>
 
 <h1>Welcome, {{ user.username }}</h1>
 
-
-
 <div class="dashboard-container">
-   <div class="card">
-    <h2>Your Profile</h2>
-    
-    {% if show_form %}
-        <form method="post">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit">Save Changes</button>
-        </form>
-    {% else %}
-        <p><strong>Username:</strong> {{ user.username }}</p>
-        <p><strong>Email:</strong> {{ user.email }}</p>
-        <a href="?edit=1"><button>Edit Profile</button></a>
-    {% endif %}
-</div>
     <div class="card">
         <h2>Wallet</h2>
         {% if wallet %}
@@ -73,71 +115,72 @@
         {% endif %}
     </div>
 
-    <div class="card">
-        <h2>Shipments</h2>
-        {% if shipments %}
-            <table>
-                <tr><th>Tracking #</th><th>Origin</th><th>Destination</th><th>Status</th><th>Shipped</th><th>Delivered</th></tr>
-                {% for s in shipments %}
-                <tr>
-                    <td>{{ s.tracking_number }}</td><td>{{ s.origin }}</td><td>{{ s.destination }}</td>
-                    <td>{{ s.status }}</td><td>{{ s.shipment_date }}</td><td>{{ s.delivery_date|default:"-" }}</td>
-                </tr>
-                {% endfor %}
-            </table>
-        {% else %}
-            <p class="no-data">No shipments found.</p>
-        {% endif %}
-    </div>
+        <div class="card">
+            <h2>Shipments</h2>
+            {% if shipments %}
+                <table>
+                    <tr><th>Tracking #</th><th>Origin</th><th>Destination</th><th>Status</th><th>Shipped</th><th>Delivered</th></tr>
+                    {% for s in shipments %}
+                    <tr>
+                        <td>{{ s.tracking_number }}</td><td>{{ s.origin }}</td><td>{{ s.destination }}</td>
+                        <td>{{ s.status }}</td><td>{{ s.shipment_date }}</td><td>{{ s.delivery_date|default:"-" }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            {% else %}
+                <p class="no-data">No shipments found.</p>
+            {% endif %}
+        </div>
 
-    <div class="card">
-        <h2>Payments</h2>
-        {% if payments %}
-            <table>
-                <tr><th>Transaction ID</th><th>Amount</th><th>Method</th><th>Date</th></tr>
-                {% for p in payments %}
-                <tr>
-                    <td>{{ p.transaction_id }}</td><td>{{ p.amount }}</td><td>{{ p.payment_method }}</td><td>{{ p.payment_date }}</td>
-                </tr>
-                {% endfor %}
-            </table>
-        {% else %}
-            <p class="no-data">No payments found.</p>
-        {% endif %}
-    </div>
+        <div class="card">
+            <h2>Payments</h2>
+            {% if payments %}
+                <table>
+                    <tr><th>Transaction ID</th><th>Amount</th><th>Method</th><th>Date</th></tr>
+                    {% for p in payments %}
+                    <tr>
+                        <td>{{ p.transaction_id }}</td><td>{{ p.amount }}</td><td>{{ p.payment_method }}</td><td>{{ p.payment_date }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            {% else %}
+                <p class="no-data">No payments found.</p>
+            {% endif %}
+        </div>
 
-    <div class="card">
-        <h2>Refunds</h2>
-        {% if refunds %}
-            <table>
-                <tr><th>Shipment</th><th>Amount</th><th>Reason</th><th>Date</th></tr>
-                {% for r in refunds %}
-                <tr>
-                    <td>{{ r.shipment.tracking_number }}</td><td>{{ r.refund_amount }}</td><td>{{ r.reason }}</td><td>{{ r.refund_date }}</td>
-                </tr>
-                {% endfor %}
-            </table>
-        {% else %}
-            <p class="no-data">No refunds found.</p>
-        {% endif %}
-    </div>
+        <div class="card">
+            <h2>Refunds</h2>
+            {% if refunds %}
+                <table>
+                    <tr><th>Shipment</th><th>Amount</th><th>Reason</th><th>Date</th></tr>
+                    {% for r in refunds %}
+                    <tr>
+                        <td>{{ r.shipment.tracking_number }}</td><td>{{ r.refund_amount }}</td><td>{{ r.reason }}</td><td>{{ r.refund_date }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            {% else %}
+                <p class="no-data">No refunds found.</p>
+            {% endif %}
+        </div>
 
-    <div class="card">
-        <h2>FX Transactions</h2>
-        {% if fx_transactions %}
-            <table>
-                <tr><th>From</th><th>To</th><th>Original</th><th>Converted</th><th>Rate</th><th>Date</th></tr>
-                {% for fx in fx_transactions %}
-                <tr>
-                    <td>{{ fx.original_currency }}</td><td>{{ fx.converted_currency }}</td>
-                    <td>{{ fx.original_amount }}</td><td>{{ fx.converted_amount }}</td>
-                    <td>{{ fx.fx_rate }}</td><td>{{ fx.transaction_date }}</td>
-                </tr>
-                {% endfor %}
-            </table>
-        {% else %}
-            <p class="no-data">No FX transactions found.</p>
-        {% endif %}
+        <div class="card">
+            <h2>FX Transactions</h2>
+            {% if fx_transactions %}
+                <table>
+                    <tr><th>From</th><th>To</th><th>Original</th><th>Converted</th><th>Rate</th><th>Date</th></tr>
+                    {% for fx in fx_transactions %}
+                    <tr>
+                        <td>{{ fx.original_currency }}</td><td>{{ fx.converted_currency }}</td>
+                        <td>{{ fx.original_amount }}</td><td>{{ fx.converted_amount }}</td>
+                        <td>{{ fx.fx_rate }}</td><td>{{ fx.transaction_date }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            {% else %}
+                <p class="no-data">No FX transactions found.</p>
+            {% endif %}
+        </div>
     </div>
 </div>
 {% endblock %}
