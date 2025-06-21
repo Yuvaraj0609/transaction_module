@@ -84,7 +84,7 @@
     }
 
     .logout-link {
-        background-color: whitesmoke;
+        background-color: #dc3545;
         padding: 10px;
         border-radius: 5px;
         text-align: center;
@@ -93,7 +93,7 @@
     }
 
     .logout-link a {
-        color:#4441a8 ;
+        color: white;
         text-decoration: none;
     }
 
@@ -102,19 +102,55 @@
     }
 </style>
 
-<h1>Welcome, {{ user.username }}</h1>
-
-<div class="dashboard-container">
-    <div class="card">
-        <h2>Wallet</h2>
-        {% if wallet %}
-            <p>Balance: ₹{{ wallet.balance }}</p>
-            <p>Last Updated: {{ wallet.last_updated }}</p>
-        {% else %}
-            <p class="no-data">No wallet found.</p>
-        {% endif %}
+<div class="sidebar">
+    <ul>
+        <li class="active">🏠 Dashboard</li>
+        <li>📝 Quote</li>
+        <li>📦 Pickup Request</li>
+        <li>🔍 Tracking</li>
+        <li>🏷 Pricing</li>
+        <li>🛒 Cart</li>
+        <li>📞 Customer Support</li>
+    </ul>
+    <div class="logout-link">
+        <a href="{% url 'login' %}">🚪 Logout</a>
     </div>
+</div>
+{% endblock %}
 
+{% block content %}
+<div class="main">
+    <h1>Welcome, {{ user.username }}</h1>
+
+    <div class="dashboard-container">
+        <!-- Your Profile Card -->
+        <div class="card">
+            <h2>Your Profile</h2>
+            {% if show_form %}
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    <button type="submit">Save Changes</button>
+                </form>
+            {% else %}
+                <p><strong>Username:</strong> {{ user.username }}</p>
+                <p><strong>Email:</strong> {{ user.email }}</p>
+                <a href="?edit=1"><button>Edit Profile</button></a>
+            {% endif %}
+        </div>
+
+        <!-- Wallet -->
+        <div class="card">
+            <h2>Wallet</h2>
+            {% if wallet %}
+                <p>Balance: ₹{{ wallet.balance }}</p>
+                <p>Last Updated: {{ wallet.last_updated }}</p>
+            {% else %}
+                <p class="no-data">No wallet found.</p>
+            {% endif %}
+        </div>
+
+        <!-- Shipments -->
         <div class="card">
             <h2>Shipments</h2>
             {% if shipments %}
@@ -132,6 +168,7 @@
             {% endif %}
         </div>
 
+        <!-- Payments -->
         <div class="card">
             <h2>Payments</h2>
             {% if payments %}
@@ -148,6 +185,7 @@
             {% endif %}
         </div>
 
+        <!-- Refunds -->
         <div class="card">
             <h2>Refunds</h2>
             {% if refunds %}
@@ -164,6 +202,7 @@
             {% endif %}
         </div>
 
+        <!-- FX Transactions -->
         <div class="card">
             <h2>FX Transactions</h2>
             {% if fx_transactions %}
